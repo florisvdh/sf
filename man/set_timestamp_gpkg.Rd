@@ -19,7 +19,7 @@ workflows.}
 Prints a message with the number of affected rows in \code{gpkg_contents}.}
 }
 \value{
-Value \code{0} is returned invisibly.
+\code{NULL} is returned invisibly.
 }
 \description{
 Overwrites all timestamps (column \code{last_change}) of the

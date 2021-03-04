@@ -17,7 +17,7 @@
 #' Prints a message with the number of affected rows in \code{gpkg_contents}.
 #'
 #' @return
-#' Value \code{0} is returned invisibly.
+#' \code{NULL} is returned invisibly.
 #'
 #' @examples
 #' library(openssl)
@@ -124,5 +124,5 @@ set_timestamp_gpkg <- function(dsn,
 			timestamp)
 	}
 	RSQLite::dbDisconnect(con)
-	return(invisible(0))
+	return(invisible(NULL))
 }
