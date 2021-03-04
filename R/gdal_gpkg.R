@@ -1,23 +1,26 @@
-#' Set explicit timestamp in a GeoPackage 'gpkg_contents' table
+#' Set explicit timestamp to reproducibly write GeoPackage files
 #'
-#' Overwrites all timestamps (column \code{last_change}) of the
-#' \code{gpkg_contents} table in an existing GeoPackage file.
+#' Presets the timestamp for usage by GDAL.
+#' After this, newly written GeoPackage files
+#' created by the GDAL vector or raster driver (e.g. through
+#' \code{sf::st_write()} or \code{stars::write_stars()})
+#' will carry this timestamp.
 #' As such the function assists in making a binary-reproducible GeoPackage file.
 #'
-#' Internally the timestamp is converted to a specific ISO 8601 format
-#' that is required by the GeoPackage standard.
+#' The function converts the timestamp to a very specific ISO 8601 format
+#' that is required by the GeoPackage standard, including conversion to UTC.
+#' Cf. \href{https://www.geopackage.org/spec130/#r15}{Requirement 15} in
+#' version 1.3.
+#' GDAL uses the timestamp to set the \code{last_change} column of the
+#' \code{gpkg_contents} table in newly written GeoPackage files.
 #'
-#' @param dsn the path to the GeoPackage file (*.gpkg)
 #' @param timestamp a \code{Date} or \code{POSIXct} object, used to generate
 #' the timestamp.
 #' For a \code{Date} object, time will be considered as 00:00:00 local time.
-#' Defaults to system time, however must be set explicitly for reproducible
-#' workflows.
-#' @param verbose Logical.
-#' Prints a message with the number of affected rows in \code{gpkg_contents}.
 #'
 #' @return
-#' \code{NULL} is returned invisibly.
+#' Previous value of system variable \code{OGR_CURRENT_DATE} is returned
+#' invisibly.
 #'
 #' @examples
 #' library(openssl)
@@ -40,28 +43,27 @@
 #'   # compare:
 #' md5_notimeset1 == md5_notimeset2
 #'
-#' # Setting a fixed date/time
-#' (fixed_date <- as.POSIXct("2020-12-25"))
-#' (fixed_time <- as.POSIXct("2020-12-25 12:00:00", tz = "CET"))
-#'
+#' # Setting a fixed date
 #' filepath_timeset <- file.path(tempdir(), "b_pump_timeset.gpkg")
+#' (fixed_date <- as.POSIXct("2020-12-25"))
+#' set_timestamp_gpkg(fixed_date)
 #'   # write 1 (date):
 #' st_write(sf_layer, dsn = filepath_timeset)
-#' set_timestamp_gpkg(filepath_timeset, fixed_date)
 #' md5_timeset1 <- md5sum(filepath_timeset)
 #'   # write 2 (date):
 #' st_write(sf_layer, dsn = filepath_timeset, delete_dsn = TRUE)
-#' set_timestamp_gpkg(filepath_timeset, fixed_date)
 #' md5_timeset2 <- md5sum(filepath_timeset)
 #'   # compare:
 #' all.equal(md5_timeset1, md5_timeset2)
+#'
+#' # Setting a fixed time
+#' (fixed_time <- as.POSIXct("2020-12-25 12:00:00", tz = "CET"))
+#' set_timestamp_gpkg(fixed_time)
 #'   # write 3 (time):
 #' st_write(sf_layer, dsn = filepath_timeset, delete_dsn = TRUE)
-#' set_timestamp_gpkg(filepath_timeset, fixed_time)
 #' md5_timeset3 <- md5sum(filepath_timeset)
 #'   # write 4 (time):
 #' st_write(sf_layer, dsn = filepath_timeset, delete_dsn = TRUE)
-#' set_timestamp_gpkg(filepath_timeset, fixed_time)
 #' md5_timeset4 <- md5sum(filepath_timeset)
 #'   # compare:
 #' all.equal(md5_timeset3, md5_timeset4)
@@ -71,6 +73,8 @@
 #' library(dplyr)
 #'
 #' filepath_stars <- file.path(tempdir(), "stars_2d.gpkg")
+#' (fixed_time <- as.POSIXct("2010-02-14 12:00:00", tz = "CET"))
+#' set_timestamp_gpkg(fixed_time)
 #'
 #' stars_2d <-
 #' 	system.file("tif/L7_ETMs.tif", package = "stars") %>%
@@ -79,12 +83,10 @@
 #'   # write 1:
 #' stars_2d %>%
 #' 	write_stars(filepath_stars, driver = "GPKG")
-#' set_timestamp_gpkg(filepath_stars, fixed_time)
 #' md5_stars1 <- md5sum(filepath_stars)
 #'   # write 2:
 #' stars_2d %>%
 #' 	write_stars(filepath_stars, driver = "GPKG")
-#' set_timestamp_gpkg(filepath_stars, fixed_time)
 #' md5_stars2 <- md5sum(filepath_stars)
 #'   # compare:
 #' all.equal(md5_stars1, md5_stars2)
@@ -92,39 +94,17 @@
 #' @author Floris Vanderhaeghe, \url{https://github.com/florisvdh}
 #'
 #' @export
-set_timestamp_gpkg <- function(dsn,
-							   timestamp = Sys.time(),
-							   verbose = TRUE) {
-	stopifnot(file.exists(dsn))
-	stopifnot(is.logical(verbose), !is.na(verbose))
-	# soft checking file format:
-	if (!grepl("\\.gpkg$", dsn)) {
-		stop("Expecting a file with extension '.gpkg'")
-	}
+set_timestamp_gpkg <- function(timestamp) {
 	if (!inherits(timestamp, c("Date", "POSIXct"))) {
 		stop("timestamp must be a Date or POSIXct object")
-	}
-
-	if (!requireNamespace("RSQLite", quietly = TRUE)) {
-		stop("Package \"RSQLite\" is needed when using this function. ",
-			 "Please install it.",
-			 call. = FALSE)
 	}
 
 	timestamp <- format(timestamp,
 						format = "%Y-%m-%dT%H:%M:%S.000Z",
 						tz = "UTC")
 
-	con <- RSQLite::dbConnect(RSQLite::SQLite(), dsn)
-	updatequery <- sprintf("UPDATE gpkg_contents SET last_change = '%s'",
-						   timestamp)
-	rows <- RSQLite::dbExecute(con, updatequery)
-	if (verbose) {
-		message(
-			rows,
-			" rows of the gpkg_contents table have been set with timestamp ",
-			timestamp)
-	}
-	RSQLite::dbDisconnect(con)
-	return(invisible(NULL))
+	old <- Sys.getenv("OGR_CURRENT_DATE")
+	Sys.setenv(OGR_CURRENT_DATE = timestamp)
+
+	return(invisible(old))
 }
