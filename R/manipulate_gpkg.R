@@ -31,7 +31,7 @@ set_timestamp_gpkg <- function(dsn,
 	if (!grepl("\\.gpkg$", dsn)) {
 		stop("Expecting a file with extension '.gpkg'")
 	}
-	if (!inherits(timestamp, "Date") && !inherits(timestamp, "POSIXct")) {
+	if (!inherits(timestamp, c("Date", "POSIXct"))) {
 		stop("timestamp must be a Date or POSIXct object")
 	}
 
