@@ -11,7 +11,7 @@ set_timestamp_gpkg(dsn, timestamp = Sys.time(), verbose = TRUE)
 
 \item{timestamp}{a \code{Date} or \code{POSIXct} object, used to generate
 the timestamp.
-For a \code{Date} object, time will be set at 00:00:00 UTC.
+For a \code{Date} object, time will be considered as 00:00:00 local time.
 Defaults to system time, however must be set explicitly for reproducible
 workflows.}
 
