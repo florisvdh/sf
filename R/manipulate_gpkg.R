@@ -53,6 +53,8 @@
 #' st_write(sf_layer, dsn = filepath_timeset, delete_dsn = TRUE)
 #' set_timestamp_gpkg(filepath_timeset, fixed_date)
 #' md5_timeset2 <- md5sum(filepath_timeset)
+#'   # compare:
+#' all.equal(md5_timeset1, md5_timeset2)
 #'   # write 3 (time):
 #' st_write(sf_layer, dsn = filepath_timeset, delete_dsn = TRUE)
 #' set_timestamp_gpkg(filepath_timeset, fixed_time)
@@ -62,7 +64,7 @@
 #' set_timestamp_gpkg(filepath_timeset, fixed_time)
 #' md5_timeset4 <- md5sum(filepath_timeset)
 #'   # compare:
-#' all.equal(md5_timeset1, md5_timeset2, md5_timeset3, md5_timeset4)
+#' all.equal(md5_timeset3, md5_timeset4)
 #'
 #' # Also works for GPKG with GDAL raster driver (accessed with stars):
 #' library(stars)
