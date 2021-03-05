@@ -41,11 +41,9 @@
 #'   # compare:
 #' md5_notimeset1 == md5_notimeset2
 #'
-#' # Setting a fixed date/time
-#' (fixed_date <- as.POSIXct("2020-12-25"))
-#' (fixed_time <- as.POSIXct("2020-12-25 12:00:00", tz = "CET"))
-#'
+#' # Setting a fixed date
 #' filepath_timeset <- file.path(tempdir(), "b_pump_timeset.gpkg")
+#' (fixed_date <- as.POSIXct("2020-12-25"))
 #'   # write 1 (date):
 #' st_write(sf_layer, dsn = filepath_timeset)
 #' set_timestamp_gpkg(filepath_timeset, fixed_date)
@@ -56,6 +54,9 @@
 #' md5_timeset2 <- md5sum(filepath_timeset)
 #'   # compare:
 #' all.equal(md5_timeset1, md5_timeset2)
+#'
+#' # Setting a fixed time
+#' (fixed_time <- as.POSIXct("2020-12-25 12:00:00", tz = "CET"))
 #'   # write 3 (time):
 #' st_write(sf_layer, dsn = filepath_timeset, delete_dsn = TRUE)
 #' set_timestamp_gpkg(filepath_timeset, fixed_time)
