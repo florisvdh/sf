@@ -9,7 +9,8 @@ set_timestamp_gpkg(timestamp)
 \arguments{
 \item{timestamp}{a \code{Date} or \code{POSIXct} object, used to generate
 the timestamp.
-For a \code{Date} object, time will be considered as 00:00:00 local time.}
+For a \code{Date} object, time will be considered as \code{00:00:00} local
+time.}
 }
 \value{
 Previous value of system variable \code{OGR_CURRENT_DATE} is returned
