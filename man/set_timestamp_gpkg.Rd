@@ -78,7 +78,7 @@ md5_timeset4 <- md5sum(filepath_timeset)
   # compare:
 all.equal(md5_timeset3, md5_timeset4)
 
-# Also works for GPKG with GDAL raster driver (accessed with stars):
+# Also works for GPKG 2D gridded coverage (with stars):
 library(stars)
 library(dplyr)
 
