@@ -126,6 +126,24 @@ set_timestamp_gpkg <- function(dsn,
 			" row(s) of the gpkg_contents table have been set with timestamp ",
 			timestamp)
 	}
+
+	has_metadata <-
+		nrow(RSQLite::dbGetQuery(con, "SELECT name FROM sqlite_master
+						WHERE name == 'gpkg_metadata_reference'")) > 0
+	if (has_metadata) {
+		updatequery <-
+			sprintf("UPDATE gpkg_metadata_reference SET timestamp = '%s'",
+					timestamp)
+		rows <- RSQLite::dbExecute(con, updatequery)
+		if (verbose) {
+			message(
+				rows,
+				" row(s) of the gpkg_metadata_reference table have ",
+				"been set with timestamp ",
+				timestamp)
+		}
+	}
+
 	RSQLite::dbDisconnect(con)
 	return(invisible(NULL))
 }
