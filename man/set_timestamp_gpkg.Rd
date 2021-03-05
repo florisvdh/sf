@@ -16,7 +16,8 @@ Previous value of system variable \code{OGR_CURRENT_DATE} is returned
 invisibly.
 }
 \description{
-Presets the timestamp for usage by GDAL.
+Presets the timestamp for usage by GDAL by setting the environment variable
+\code{OGR_CURRENT_DATE}.
 After this, newly written GeoPackage files
 created by the GDAL vector or raster driver (e.g. through
 \code{sf::st_write()} or \code{stars::write_stars()})
