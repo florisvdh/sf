@@ -123,7 +123,7 @@ set_timestamp_gpkg <- function(dsn,
 	if (verbose) {
 		message(
 			rows,
-			" rows of the gpkg_contents table have been set with timestamp ",
+			" row(s) of the gpkg_contents table have been set with timestamp ",
 			timestamp)
 	}
 	RSQLite::dbDisconnect(con)
