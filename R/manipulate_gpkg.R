@@ -2,6 +2,8 @@
 #'
 #' Overwrites all timestamps (column \code{last_change}) of the
 #' \code{gpkg_contents} table in an existing GeoPackage file.
+#' If the optional table \code{gpkg_metadata_reference} is present, does the
+#' same with its \code{timestamp} column.
 #' As such the function assists in making a binary-reproducible GeoPackage file.
 #'
 #' Internally the timestamp is converted to a specific ISO 8601 format
@@ -15,7 +17,7 @@
 #' Defaults to system time, however must be set explicitly for reproducible
 #' workflows.
 #' @param verbose Logical.
-#' Prints a message with the number of affected rows in \code{gpkg_contents}.
+#' For each relevant table, prints a message with the number of affected rows.
 #'
 #' @return
 #' \code{NULL} is returned invisibly.
